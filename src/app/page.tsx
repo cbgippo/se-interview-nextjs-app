@@ -63,7 +63,7 @@ export default function HomePage() {
         <>
           <TimeGreeting firstName={user?.firstName || undefined} />
           <Text size="4" color="gray" align="center" mt="2">
-            Manage your organization's users, sessions, and security settings with WorkOS authentication
+            Manage your organization&apos;s users, sessions, and security settings with WorkOS authentication
           </Text>
           <Flex align="center" gap="3" mt="4">
             <Button asChild size="3" variant="outline">
