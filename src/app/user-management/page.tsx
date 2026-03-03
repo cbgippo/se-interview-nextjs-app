@@ -27,10 +27,6 @@
 import React, { useState, useEffect } from "react";
 import { UsersManagement, WorkOsWidgets } from "@workos-inc/widgets";
 import { Button, Flex, Heading, Text, Callout, Select, Card } from "@radix-ui/themes";
-
-/**
- * Error boundary component to catch and handle widget errors
- */
 class WidgetErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean; error?: Error }
@@ -44,9 +40,6 @@ class WidgetErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Error boundary for production - no console logging
-  }
 
   render() {
     if (this.state.hasError) {
@@ -77,7 +70,7 @@ async function getWidgetToken(organizationId: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ organizationId }),
+    body: JSON.stringify({ organizationId, widgetType: "users_management" }),
   });
 
   if (!response.ok) {

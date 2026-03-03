@@ -24,6 +24,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import React from "react";
 import { UserSessions, WorkOsWidgets } from "@workos-inc/widgets";
 import { Button, Flex, Heading, Text, Callout } from "@radix-ui/themes";
 
@@ -39,7 +40,7 @@ async function getWidgetToken(organizationId?: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ organizationId }),
+    body: JSON.stringify({ organizationId, widgetType: "user_sessions" }),
   });
 
   if (!response.ok) {
@@ -68,6 +69,21 @@ async function getOrganizations() {
   return data.organizations;
 }
 
+async function getCurrentSessionId() {
+  const response = await fetch("/api/session", { cache: "no-store" });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Failed to fetch session (${response.status})`);
+  }
+
+  const data = (await response.json()) as { sessionId?: string };
+  if (!data.sessionId) {
+    throw new Error("Session id missing");
+  }
+  return data.sessionId;
+}
+
 export default function SessionsPage() {
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [organizations, setOrganizations] = useState<any[]>([]);
@@ -84,19 +100,20 @@ export default function SessionsPage() {
         // First, get organizations to provide proper context
         const orgs = await getOrganizations();
         setOrganizations(orgs);
-        
-        if (orgs.length > 0) {
-          // Use the first organization for sessions context
-          const organizationId = orgs[0].id;
-          setSelectedOrganization(organizationId);
-          
-          const token = await getWidgetToken(organizationId);
-          setAuthToken(token);
-        } else {
-          // Fallback: try without organization context
-          const token = await getWidgetToken();
-          setAuthToken(token);
+
+        if (orgs.length === 0) {
+          throw new Error("No organizations found for this user");
         }
+
+        const sessionId = await getCurrentSessionId();
+        setCurrentSessionId(sessionId);
+
+        // Use the first organization for sessions context
+        const organizationId = orgs[0].id;
+        setSelectedOrganization(organizationId);
+
+        const token = await getWidgetToken(organizationId);
+        setAuthToken(token);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load sessions widget");
       } finally {
@@ -189,10 +206,7 @@ export default function SessionsPage() {
       {authToken && (
         <WorkOsWidgets>
           <div style={{ width: "100%", flex: 1, minHeight: 0 }}>
-            <UserSessions 
-              authToken={authToken} 
-              currentSessionId={currentSessionId}
-            />
+            <UserSessions authToken={authToken} currentSessionId={currentSessionId} />
           </div>
         </WorkOsWidgets>
       )}

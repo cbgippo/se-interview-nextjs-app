@@ -1,11 +1,10 @@
-// Import the base CSS styles for the radix-ui components.
 import "@radix-ui/themes/styles.css";
-
 import type { Metadata } from "next";
-import NextLink from "next/link";
-import { Theme, Card, Container, Flex, Button, Box } from "@radix-ui/themes";
+import { Theme, Container, Card, Flex, Button, Box } from "@radix-ui/themes";
 import { Footer } from "./components/footer";
 import { SignInButton } from "./components/sign-in-button";
+import { Navigation } from "./components/navigation";
+import { Providers } from "./providers";
 import {
   AuthKitProvider,
   Impersonation,
@@ -30,37 +29,30 @@ export default function RootLayout({
           style={{ backgroundColor: "var(--gray-1)" }}
         >
           <AuthKitProvider>
-            <Impersonation />
-            <Container style={{ backgroundColor: "var(--gray-1)" }}>
-              <Flex direction="column" gap="5" p="5" height="100vh">
-                <Box asChild flexGrow="1">
-                  <Card size="4">
-                    <Flex direction="column" height="100%">
-                      <Flex asChild justify="between">
-                        <header>
-                          <Flex gap="4">
-                            <Button asChild variant="soft">
-                              <NextLink href="/">Home</NextLink>
-                            </Button>
+            <Providers>
+              <Impersonation />
+              <Container style={{ backgroundColor: "var(--gray-1)" }}>
+                <Flex direction="column" gap="5" p="5" height="100vh">
+                  <Box asChild flexGrow="1">
+                    <Card size="4">
+                      <Flex direction="column" height="100%">
+                        <Flex asChild justify="between">
+                          <header>
+                            <Navigation />
+                            <SignInButton />
+                          </header>
+                        </Flex>
 
-                            <Button asChild variant="soft">
-                              <NextLink href="/account">Account</NextLink>
-                            </Button>
-                          </Flex>
-
-                          <SignInButton />
-                        </header>
+                        <Flex flexGrow="1" align="center" justify="center">
+                          <main>{children}</main>
+                        </Flex>
                       </Flex>
-
-                      <Flex flexGrow="1" align="center" justify="center">
-                        <main>{children}</main>
-                      </Flex>
-                    </Flex>
-                  </Card>
-                </Box>
-                <Footer />
-              </Flex>
-            </Container>
+                    </Card>
+                  </Box>
+                  <Footer />
+                </Flex>
+              </Container>
+            </Providers>
           </AuthKitProvider>
         </Theme>
       </body>

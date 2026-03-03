@@ -24,6 +24,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import React from "react";
 import { UserSecurity, WorkOsWidgets } from "@workos-inc/widgets";
 import { Button, Flex, Heading, Text, Callout } from "@radix-ui/themes";
 
@@ -39,7 +40,7 @@ async function getWidgetToken(organizationId?: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ organizationId }),
+    body: JSON.stringify({ organizationId, widgetType: "user_security" }),
   });
 
   if (!response.ok) {
@@ -83,19 +84,17 @@ export default function SecurityPage() {
         // First, get organizations to provide proper context
         const orgs = await getOrganizations();
         setOrganizations(orgs);
-        
-        if (orgs.length > 0) {
-          // Use the first organization for security context
-          const organizationId = orgs[0].id;
-          setSelectedOrganization(organizationId);
-          
-          const token = await getWidgetToken(organizationId);
-          setAuthToken(token);
-        } else {
-          // Fallback: try without organization context
-          const token = await getWidgetToken();
-          setAuthToken(token);
+
+        if (orgs.length === 0) {
+          throw new Error("No organizations found for this user");
         }
+
+        // Use the first organization for security context
+        const organizationId = orgs[0].id;
+        setSelectedOrganization(organizationId);
+
+        const token = await getWidgetToken(organizationId);
+        setAuthToken(token);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load security widget");
       } finally {

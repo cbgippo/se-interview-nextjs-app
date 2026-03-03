@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { SignInButton } from "./components/sign-in-button";
 import { useAuth } from "@workos-inc/authkit-nextjs/components";
+import { useMe } from "@/app/hooks/use-me";
 
 function TimeGreeting({ firstName }: { firstName?: string }) {
   const [timeGreeting, setTimeGreeting] = useState("Good day");
@@ -43,6 +44,7 @@ function TimeGreeting({ firstName }: { firstName?: string }) {
 export default function HomePage() {
   const { user, loading } = useAuth();
   const [isHydrated, setIsHydrated] = useState(false);
+  const { data: me } = useMe(Boolean(user));
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -61,7 +63,7 @@ export default function HomePage() {
     <Flex direction="column" align="center" gap="2">
       {user ? (
         <>
-          <TimeGreeting firstName={user?.firstName || undefined} />
+          <TimeGreeting firstName={(me?.firstName ?? user?.firstName) || undefined} />
           <Text size="4" color="gray" align="center" mt="2">
             Manage your organization&apos;s users, sessions, and security settings with WorkOS authentication
           </Text>

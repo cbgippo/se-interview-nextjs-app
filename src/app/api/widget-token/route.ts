@@ -20,6 +20,26 @@
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { WorkOS } from "@workos-inc/node";
 
+const workosApiKey = process.env.WORKOS_API_KEY;
+
+if (!workosApiKey) {
+  throw new Error("Missing WORKOS_API_KEY");
+}
+
+const workos = new WorkOS(workosApiKey);
+
+type WidgetType = "users_management" | "user_profile" | "user_sessions" | "user_security";
+
+type WidgetScope = "widgets:users-table:manage";
+
+function getWidgetScopes(widgetType: WidgetType): WidgetScope[] | undefined {
+  if (widgetType === "users_management") {
+    return ["widgets:users-table:manage"];
+  }
+
+  return undefined;
+}
+
 export async function POST(request: Request) {
   try {
     // Validate user authentication
@@ -29,22 +49,26 @@ export async function POST(request: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Initialize WorkOS client
-    const workos = new WorkOS(process.env.WORKOS_API_KEY);
-    
-    // Parse request body for organization ID
+    // Parse request body
     const body = await request.json().catch(() => ({}));
     const organizationId = body.organizationId;
+    const widgetType = body.widgetType as WidgetType | undefined;
 
     if (!organizationId) {
       return Response.json({ error: "Organization ID required" }, { status: 400 });
     }
 
+    if (!widgetType) {
+      return Response.json({ error: "Widget type required" }, { status: 400 });
+    }
+
+    const scopes = getWidgetScopes(widgetType);
+
     // Generate widget token with User Management permissions
     const authToken = await workos.widgets.getToken({
       userId: user.id,
       organizationId,
-      scopes: ['widgets:users-table:manage'],
+      ...(scopes ? { scopes } : {}),
     });
 
     return Response.json({ authToken });
