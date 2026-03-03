@@ -1,32 +1,70 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import NextLink from "next/link";
-import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { SignInButton } from "./components/sign-in-button";
+import { useAuth } from "@workos-inc/authkit-nextjs/components";
 
-export default async function HomePage() {
-  const { user } = await withAuth();
+function TimeGreeting({ firstName }: { firstName?: string }) {
+  const [timeGreeting, setTimeGreeting] = useState("Good day");
 
-  // Get current hour for time-based greeting
-  const currentHour = new Date().getHours();
-  let timeGreeting = "Good day";
+  useEffect(() => {
+    const updateGreeting = () => {
+      const currentHour = new Date().getHours();
+      let greeting = "Good day";
 
-  if (currentHour >= 5 && currentHour < 12) {
-    timeGreeting = "Good morning";
-  } else if (currentHour >= 12 && currentHour < 17) {
-    timeGreeting = "Good afternoon";
-  } else if (currentHour >= 17 && currentHour < 22) {
-    timeGreeting = "Good evening";
-  } else {
-    timeGreeting = "Good night";
+      if (currentHour >= 5 && currentHour < 12) {
+        greeting = "Good morning";
+      } else if (currentHour >= 12 && currentHour < 17) {
+        greeting = "Good afternoon";
+      } else if (currentHour >= 17 && currentHour < 22) {
+        greeting = "Good evening";
+      } else {
+        greeting = "Good night";
+      }
+
+      setTimeGreeting(greeting);
+    };
+
+    updateGreeting();
+    const interval = setInterval(updateGreeting, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Heading size="8">
+      {timeGreeting}{firstName && `, ${firstName}!`}
+    </Heading>
+  );
+}
+
+export default function HomePage() {
+  const { user, loading } = useAuth();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return <div style={{ height: "100vh" }} />;
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
     <Flex direction="column" align="center" gap="2">
       {user ? (
         <>
-          <Heading size="8">
-            {timeGreeting}{user?.firstName && `, ${user?.firstName}!`}
-          </Heading>
+          <TimeGreeting firstName={user?.firstName || undefined} />
+          <Text size="4" color="gray" align="center" mt="2">
+            Manage your organization's users, sessions, and security settings with WorkOS authentication
+          </Text>
           <Flex align="center" gap="3" mt="4">
             <Button asChild size="3" variant="outline">
               <NextLink href="/user-management">User Management</NextLink>

@@ -1,6 +1,25 @@
-# Take-Home Challenge: User Management Widget Implementation
+# WorkOS User Management Application
 
-This is a Next.js application that demonstrates authentication with AuthKit and the WorkOS Node SDK. Your challenge is to implement the **User Management Widget** from WorkOS to allow users to manage team members within their organization.
+A Next.js application that demonstrates authentication with WorkOS AuthKit and implements the User Management Widget for team administration. This app allows organization admins to invite users, manage roles, and oversee team membership through an intuitive interface.
+
+## Quick Start
+
+### Local Development
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Set up your environment variables (see Prerequisites below)
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Deployment
+The application is deployed on Vercel: [https://se-interview-nextjs-app-zeta.vercel.app](https://se-interview-nextjs-app-zeta.vercel.app)
 
 ## Challenge Overview
 
