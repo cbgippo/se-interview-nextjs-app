@@ -12,8 +12,8 @@ import {
 } from "@workos-inc/authkit-nextjs/components";
 
 export const metadata: Metadata = {
-  title: "Example AuthKit Authenticated App",
-  description: "Example Next.js application demonstrating how to use AuthKit.",
+  title: "Clare's AuthKit Authenticated App",
+  description: "Clare's example Next.js application demonstrating how to use AuthKit.",
 };
 
 export default function RootLayout({
